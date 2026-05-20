@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>儿童古诗朗读</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", sans-serif;
+        }
+        body {
+            background: #FFF5F8;
+            padding: 15px;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+        .title {
+            text-align: center;
+            font-size: 34px;
+            margin: 25px 0;
+            color: #FF6B81;
+            font-weight: bold;
+            letter-spacing: 3px;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 35px 25px;
+            box-shadow: 0 4px 15px rgba(255, 150, 180, 0.25);
+            margin-bottom: 25px;
+        }
+        .poem-title {
+            font-size: 30px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 12px;
+            color: #E64A19;
+        }
+        .poem-author {
+            text-align: center;
+            color: #888;
+            font-size: 22px;
+            margin-bottom: 25px;
+        }
+        .poem-line {
+            text-align: center;
+            margin: 18px 0;
+        }
+        .char-box {
+            display: inline-block;
+            vertical-align: top;
+            text-align: center;
+            margin: 0 4px;
+            min-width: 42px;
+        }
+        .pinyin {
+            font-size: 20px;
+            color: #1976D2;
+            font-weight: 600;
+            height: 28px;
+            line-height: 28px;
+        }
+        .hanzi {
+            font-size: 32px;
+            font-weight: bold;
+            color: #212121;
+            height: 42px;
+            line-height: 42px;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        button {
+            padding: 14px 26px;
+            border: none;
+            border-radius: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            color: #fff;
+            transition: all 0.2s ease;
+            font-weight: bold;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        .play-btn {background: #48DBFB;}
+        .auto-play-btn {background: #A36FFF;}
+        .next-btn {background: #FF9F43;}
+        .audio-set {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap:12px;
+            margin:25px 0;
+        }
+        .volume-text {font-size: 21px;color:#555;font-weight: 500;}
+        input#volume {width:180px;height: 10px;}
+        audio {display: none;}
+    </style>
+</head>
+<body>
+    <h1 class="title">宝贝古诗诵读</h1>
+
+    <div class="card">
+        <div class="poem-title" id="title"></div>
+        <div class="poem-author" id="author"></div>
+        <div id="poemContainer"></div>
+
+        <div class="audio-set">
+            <span class="volume-text">音量</span>
+            <input type="range" id="volume" min="0" max="1" step="0.1" value="0.8">
+        </div>
+
+        <div class="btn-group">
+            <button class="play-btn" onclick="switchAudio()" id="playBtn">播放</button>
+            <button class="auto-play-btn" onclick="toggleAutoPlay()">自动跟读<span id="autoText">开启</span></button>
+            <button class="next-btn" onclick="nextPoem()">换下一首</button>
+        </div>
+    </div>
+
+    <audio id="audioPlayer" preload="auto">
+
+<script>
+const AUDIO_PATH = "audio/";
+const poems = [
+{title:"望庐山瀑布",author:"唐·李白",audio:"wanglushanpubu.mp3",
+content:"日 照 香 炉 生 紫 烟，|遥 看 瀑 布 挂 前 川。|飞 流 直 下 三 千 尺，|疑 是 银 河 落 九 天。",
+pinyin:"rì zhào xiāng lú shēng zǐ yān yáo kàn pù bù guà qián chuān fēi liú zhí xià sān qiān chǐ yí shì yín hé luò jiǔ tiān"},
+{title:"悯农·其一",author:"唐·李绅",audio:"minnongqiyi.mp3",
+content:"春 种 一 粒 粟，|秋 收 万 颗 子。|四 海 无 闲 田，|农 夫 犹 饿 死。",
+pinyin:"chūn zhǒng yī lì sù qiū shōu wàn kē zǐ sì hǎi wú xián tián nóng fū yóu è sǐ"},
+{title:"出塞",author:"唐·王昌龄",audio:"chusai.mp3",
+content:"秦 时 明 月 汉 时 关，|万 里 长 征 人 未 还。|但 使 龙 城 飞 将 在，|不 教 胡 马 度 阴 山。",
+pinyin:"qín shí míng yuè hàn shí guān wàn lǐ cháng zhēng rén wèi huán dàn shǐ lóng chéng fēi jiāng zài bù jiào hú mǎ dù yīn shān"},
+{title:"劝学",author:"唐·颜真卿",audio:"quanxue.mp3",
+content:"三 更 灯 火 五 更 鸡，|正 是 男 儿 读 书 时。|黑 发 不 知 勤 学 早，|白 首 方 悔 读 书 迟。",
+pinyin:"sān gēng dēng huǒ wǔ gēng jī zhèng shì nán ér dú shū shí hēi fà bù zhī qín xué zǎo bái shǒu fāng huǐ dú shū chí"},
+{title:"独坐敬亭山",author:"唐·李白",audio:"duzuojingtingshan.mp3",
+content:"众 鸟 高 飞 尽，|孤 云 独 去 闲。|相 看 两 不 厌，|只 有 敬 亭 山。",
+pinyin:"zhòng niǎo gāo fēi jìn gū yún dú qù xián xiāng kàn liǎng bù yàn zhǐ yǒu jìng tíng shān"},
+{title:"早冬",author:"唐·白居易",audio:"zaodong.mp3",
+content:"十 月 江 南 天 气 好，|可 怜 冬 景 似 春 华。|霜 轻 未 杀 萋 萋 草，|日 暖 初 干 漠 漠 沙。",
+pinyin:"shí yuè jiāng nán tiān qì hǎo kě lián dōng jǐng sì chūn huá shuāng qīng wèi shā qī qī cǎo rì nuǎn chū gān mò mò shā"},
+{title:"村居",author:"清·高鼎",audio:"cunju.mp3",
+content:"草 长 莺 飞 二 月 天，|拂 堤 杨 柳 醉 春 烟。|儿 童 散 学 归 来 早，|忙 趁 东 风 放 纸 鸢。",
+pinyin:"cǎo zhǎng yīng fēi èr yuè tiān fú dī yáng liǔ zuì chūn yān ér tóng sàn xué guī lái zǎo máng chèn dōng fēng fàng zhǐ yuān"},
+{title:"春夜喜雨",author:"唐·杜甫",audio:"chunyexiyu.mp3",
+content:"好 雨 知 时 节，|当 春 乃 发 生。|随 风 潜 入 夜，|润 物 细 无 声。",
+pinyin:"hǎo yǔ zhī shí jié dāng chūn nǎi fā shēng suí fēng qián rù yè rùn wù xì wú shēng"},
+{title:"早发白帝城",author:"唐·李白",audio:"zaofabaidicheng.mp3",
+content:"朝 辞 白 帝 彩 云 间，|千 里 江 陵 一 日 还。|两 岸 猿 声 啼 不 住，|轻 舟 已 过 万 重 山。",
+pinyin:"zhāo cí bái dì cǎi yún jiān qiān lǐ jiāng líng yī rì huán liǎng àn yuán shēng tí bù zhù qīng zhōu yǐ guò wàn chóng shān"},
+{title:"题西林壁",author:"宋·苏轼",audio:"tixilinbi.mp3",
+content:"横 看 成 岭 侧 成 峰，|远 近 高 低 各 不 同。|不 识 庐 山 真 面 目，|只 缘 身 在 此 山 中。",
+pinyin:"héng kàn chéng lǐng cè chéng fēng yuǎn jìn gāo dī gè bù tóng bù shí lú shān zhēn miàn mù zhǐ yuán shēn zài cǐ shān zhōng"},
+{title:"舟夜书所见",author:"清·查慎行",audio:"zhouyeshusuojian.mp3",
+content:"月 黑 见 渔 灯，|孤 光 一 点 萤。|微 微 风 簇 浪，|散 作 满 河 星。",
+pinyin:"yuè hēi jiàn yú dēng gū guāng yī diǎn yíng wēi wēi fēng cù làng sàn zuò mǎn hé xīng"},
+{title:"元日",author:"宋·王安石",audio:"yuanri.mp3",
+content:"爆 竹 声 中 一 岁 除，|春 风 送 暖 入 屠 苏。|千 门 万 户 曈 曈 日，|总 把 新 桃 换 旧 符。",
+pinyin:"bào zhú shēng zhōng yī suì chú chūn fēng sòng nuǎn rù tú sū qiān mén wàn hù tóng tóng rì zǒng bǎ xīn táo huàn jiù fú"},
+{title:"大林寺桃花",author:"唐·白居易",audio:"dalinsitaohua.mp3",
+content:"人 间 四 月 芳 菲 尽，|山 寺 桃 花 始 盛 开。|长 恨 春 归 无 觅 处，|不 知 转 入 此 中 来。",
+pinyin:"rén jiān sì yuè fāng fēi jìn shān sì táo huā shǐ shèng kāi cháng hèn chūn guī wú mì chù bù zhī zhuǎn rù cǐ zhōng lái"},
+{title:"山行",author:"唐·杜牧",audio:"shanxing.mp3",
+content:"远 上 寒 山 石 径 斜，|白 云 生 处 有 人 家。|停 车 坐 爱 枫 林 晚，|霜 叶 红 于 二 月 花。",
+pinyin:"yuǎn shàng hán shān shí jìng xié bái yún shēng chù yǒu rén jiā tíng chē zuò ài fēng lín wǎn shuāng yè hóng yú èr yuè huā"},
+{title:"回乡偶书",author:"唐·贺知章",audio:"huixiangoushu.mp3",
+content:"少 小 离 家 老 大 回，|乡 音 无 改 鬓 毛 衰。|儿 童 相 见 不 相 识，|笑 问 客 从 何 处 来。",
+pinyin:"shào xiǎo lí jiā lǎo dà huí xiāng yīn wú gǎi bìn máo shuāi ér tóng xiāng jiàn bù xiāng shí xiào wèn kè cóng hé chù lái"},
+{title:"咏柳",author:"唐·贺知章",audio:"yongliu.mp3",
+content:"碧 玉 妆 成 一 树 高，|万 条 垂 下 绿 丝 绦。|不 知 细 叶 谁 裁 出，|二 月 春 风 似 剪 刀。",
+pinyin:"bì yù zhuāng chéng yī shù gāo wàn tiáo chuí xià lǜ sī tāo bù zhī xì yè shuí cái chū èr yuè chūn fēng sì jiǎn dāo"},
+{title:"游园不值",author:"宋·叶绍翁",audio:"youyuanbuzhi.mp3",
+content:"应 怜 屐 齿 印 苍 苔，|小 扣 柴 扉 久 不 开。|春 色 满 园 关 不 住，|一 枝 红 杏 出 墙 来。",
+pinyin:"yīng lián jī chǐ yìn cāng tái xiǎo kòu chái fēi jiǔ bù kāi chūn sè mǎn yuán guān bù zhù yī zhī hóng xìng chū qiáng lái"},
+{title:"三衢道中",author:"宋·曾几",audio:"sanqudaozhong.mp3",
+content:"梅 子 黄 时 日 日 晴，|小 溪 泛 尽 却 山 行。|绿 阴 不 减 来 时 路，|添 得 黄 鹂 四 五 声。",
+pinyin:"méi zǐ huáng shí rì rì qíng xiǎo xī fàn jìn què shān xíng lǜ yīn bù jiǎn lái shí lù tiān dé huáng lí sì wǔ shēng"},
+{title:"望洞庭",author:"唐·刘禹锡",audio:"wangdongting.mp3",
+content:"湖 光 秋 月 两 相 和，|潭 面 无 风 镜 未 磨。|遥 望 洞 庭 山 水 翠，|白 银 盘 里 一 青 螺。",
+pinyin:"hú guāng qiū yuè liǎng xiāng hé tán miàn wú fēng jìng wèi mó yáo wàng dòng tíng shān shuǐ cuì bái yín pán lǐ yī qīng luó"},
+{title:"绝句·其一",author:"唐·杜甫",audio:"jueju1.mp3",
+content:"迟 日 江 山 丽，|春 风 花 草 香。|泥 融 飞 燕 子，|沙 暖 睡 鸳 鸯。",
+pinyin:"chí rì jiāng shān lì chūn fēng huā cǎo xiāng ní róng fēi yàn zi shā nuǎn shuì yuān yāng"},
+];
+
+let currentIndex = 0;
+let currentPoem = poems[currentIndex];
+let autoPlay = true;
+const audioPlayer = document.getElementById("audioPlayer");
+const volumeInput = document.getElementById("volume");
+const playBtn = document.getElementById("playBtn");
+const totalNum = poems.length;
+
+audioPlayer.volume = 0.8;
+volumeInput.addEventListener("input",()=>{
+    audioPlayer.volume = volumeInput.value;
+})
+
+audioPlayer.addEventListener("ended",()=>{
+    if(autoPlay) audioPlayer.play();
+})
+
+function toggleAutoPlay(){
+    autoPlay = !autoPlay;
+    document.getElementById("autoText").innerText = autoPlay ? "开启" : "关闭";
+}
+
+function switchAudio(){
+    if(!currentPoem) return;
+    if(audioPlayer.paused){
+        audioPlayer.src = AUDIO_PATH + currentPoem.audio;
+        audioPlayer.play();
+        playBtn.innerText = "暂停";
+    }else{
+        audioPlayer.pause();
+        playBtn.innerText = "播放";
+    }
+}
+
+function nextPoem(){
+    audioPlayer.pause();
+    playBtn.innerText = "播放";
+    currentIndex++;
+    // 判断是否到最后一首
+    if(currentIndex >= totalNum){
+        alert("已经是最后一首古诗啦，即将回到第一首！");
+        currentIndex = 0;
+    }
+    currentPoem = poems[currentIndex];
+    renderPoem();
+    if(autoPlay){
+        setTimeout(()=>{
+            audioPlayer.src = AUDIO_PATH + currentPoem.audio;
+            audioPlayer.play();
+            playBtn.innerText = "暂停";
+        },300)
+    }
+}
+
+function renderPoem(){
+    document.getElementById("title").innerText = currentPoem.title;
+    document.getElementById("author").innerText = currentPoem.author;
+    const container = document.getElementById("poemContainer");
+    container.innerHTML = "";
+
+    const hanziAll = currentPoem.content.split("|");
+    const pinyinAll = currentPoem.pinyin.split(/\s+/);
+
+    hanziAll.forEach(line=>{
+        const hanziArr = line.trim().split(/\s+/);
+        let lineDom = document.createElement("div");
+        lineDom.className = "poem-line";
+        hanziArr.forEach(h=>{
+            let py = pinyinAll.shift() || "";
+            let box = document.createElement("div");
+            box.className = "char-box";
+            box.innerHTML = `<div class="pinyin">${py}</div><div class="hanzi">${h}</div>`;
+            lineDom.appendChild(box);
+        })
+        container.appendChild(lineDom);
+    })
+}
+
+window.onload = function(){
+    renderPoem();
+}
+</script>
+</body>
+</html>
