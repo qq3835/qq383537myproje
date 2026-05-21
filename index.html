@@ -2,110 +2,260 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>儿童古诗朗读</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>宝贝古诗诵读</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "微软雅黑", sans-serif;
+            font-family: "PingFang SC", "微软雅黑", sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
+
+        html, body {
+            width: 100%;
+            min-height: 100%;
+            overflow-x: hidden; /* 禁止横向滚动 */
+        }
+
+        :root {
+            --main-bg: linear-gradient(160deg, #FFF5F8 0%, #FFE6EF 100%);
+            --card-bg: #fff;
+            --title-color: #FF4E75;
+            --text-color: #222;
+            --pinyin-color: #3A86FF;
+            --high-light: #FF789C;
+        }
+
         body {
-            background: #FFF5F8;
-            padding: 15px;
-            max-width: 850px;
+            background: var(--main-bg);
+            padding: 12px;
+            max-width: 900px;
             margin: 0 auto;
+            animation: fadeIn 0.8s ease forwards;
+            transition: all 0.3s;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .theme-box span {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin: 0 4px;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px #0002;
+        }
+        .t1 {background:#ffd6e2;}
+        .t2 {background:#e8f8f5;}
+        .t3 {background:#f0f4ff;}
+
         .title {
             text-align: center;
-            font-size: 34px;
-            margin: 25px 0;
-            color: #FF6B81;
+            font-size: 32px;
+            margin: 10px 0 20px;
+            color: var(--title-color);
             font-weight: bold;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 10px rgba(255,78,117,0.2);
         }
+
         .card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 35px 25px;
-            box-shadow: 0 4px 15px rgba(255, 150, 180, 0.25);
-            margin-bottom: 25px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 25px 20px;
+            box-shadow: 0 8px 25px rgba(255, 120, 150, 0.18);
+            margin-bottom: 20px;
+            animation: slideUp 0.6s ease-out;
+            position: relative;
+            overflow: visible; /* 修复高度裁剪 */
         }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #FF9A9E, #FF6CA8);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .poem-title {
-            font-size: 30px;
+            font-size: 28px;
             font-weight: bold;
             text-align: center;
-            margin-bottom: 12px;
-            color: #E64A19;
+            margin-bottom: 8px;
+            color: #FF5C39;
         }
+
         .poem-author {
             text-align: center;
-            color: #888;
-            font-size: 22px;
-            margin-bottom: 25px;
+            color: #999;
+            font-size: 20px;
+            margin-bottom: 20px;
         }
+
         .poem-line {
             text-align: center;
-            margin: 18px 0;
-        }
-        .char-box {
-            display: inline-block;
-            vertical-align: top;
-            text-align: center;
-            margin: 0 4px;
-            min-width: 42px;
-        }
-        .pinyin {
-            font-size: 20px;
-            color: #1976D2;
-            font-weight: 600;
-            height: 28px;
-            line-height: 28px;
-        }
-        .hanzi {
-            font-size: 32px;
-            font-weight: bold;
-            color: #212121;
-            height: 42px;
-            line-height: 42px;
-        }
-        .btn-group {
+            margin: 14px 0;
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 30px;
+            gap: 2px;
         }
-        button {
-            padding: 14px 26px;
-            border: none;
-            border-radius: 50px;
-            font-size: 20px;
-            cursor: pointer;
-            color: #fff;
-            transition: all 0.2s ease;
+
+        .char-box {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 3px;
+            min-width: 38px;
+            transition: all 0.3s ease;
+        }
+        .char-box.active .hanzi {
+            color: var(--high-light);
+            transform: scale(1.1);
+        }
+        .char-box.active .pinyin {
+            color: var(--high-light);
             font-weight: bold;
         }
-        button:active {
-            transform: scale(0.95);
+
+        .pinyin {
+            font-size: 18px;
+            color: var(--pinyin-color);
+            font-weight: 600;
+            margin-bottom: 3px;
+            transition: 0.3s;
         }
-        .play-btn {background: #48DBFB;}
-        .auto-play-btn {background: #A36FFF;}
-        .next-btn {background: #FF9F43;}
+
+        .hanzi {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--text-color);
+            transition: 0.3s;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #eee;
+            border-radius: 3px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        .progress-inner {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg,#48DBFB,#A36FFF);
+            transition: width 0.1s linear;
+        }
+
         .audio-set {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap:12px;
-            margin:25px 0;
+            gap: 12px;
+            margin: 15px 0;
         }
-        .volume-text {font-size: 21px;color:#555;font-weight: 500;}
-        input#volume {width:180px;height: 10px;}
+
+        .volume-text {
+            font-size: 20px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input#volume {
+            width: 170px;
+            height: 8px;
+            border-radius: 10px;
+            outline: none;
+            -webkit-appearance: none;
+            background: #FFD6E2;
+        }
+
+        input#volume::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #FF6B81;
+            cursor: pointer;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 13px 22px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            cursor: pointer;
+            color: #fff;
+            font-weight: bold;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        button:active {
+            transform: scale(0.92);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .prev-btn {background:linear-gradient(90deg,#74b9ff,#0984e3);}
+        .play-btn {background: linear-gradient(90deg, #48DBFB, #36CFFF);}
+        .auto-play-btn {background: linear-gradient(90deg, #A36FFF, #8C5EFF);}
+        .next-btn {background: linear-gradient(90deg, #FF9F43, #FF8C32);}
+
         audio {display: none;}
+
+        /* 手机适配 */
+        @media (max-width: 480px) {
+            .title { font-size: 26px; }
+            .poem-title { font-size: 24px; }
+            .hanzi { font-size: 24px; }
+            .pinyin { font-size: 16px; }
+            .char-box { min-width: 34px; margin: 0 2px; }
+            button { padding: 11px 18px; font-size: 16px; }
+        }
     </style>
 </head>
+
 <body>
+    <div class="top-bar">
+        <div></div>
+        <div class="theme-box">
+            <span class="t1" onclick="setTheme(1)"></span>
+            <span class="t2" onclick="setTheme(2)"></span>
+            <span class="t3" onclick="setTheme(3)"></span>
+        </div>
+    </div>
+
     <h1 class="title">宝贝古诗诵读</h1>
 
     <div class="card">
@@ -113,15 +263,20 @@
         <div class="poem-author" id="author"></div>
         <div id="poemContainer"></div>
 
+        <div class="progress-bar">
+            <div class="progress-inner" id="audioProgress"></div>
+        </div>
+
         <div class="audio-set">
             <span class="volume-text">音量</span>
             <input type="range" id="volume" min="0" max="1" step="0.1" value="0.8">
         </div>
 
         <div class="btn-group">
+            <button class="prev-btn" onclick="prevPoem()">上一首</button>
             <button class="play-btn" onclick="switchAudio()" id="playBtn">播放</button>
-            <button class="auto-play-btn" onclick="toggleAutoPlay()">自动跟读<span id="autoText">开启</span></button>
-            <button class="next-btn" onclick="nextPoem()">换下一首</button>
+            <button class="auto-play-btn" onclick="toggleAutoPlay()">自动跟读 <span id="autoText">开启</span></button>
+            <button class="next-btn" onclick="nextPoem()">下一首</button>
         </div>
     </div>
 
@@ -195,19 +350,74 @@ pinyin:"chí rì jiāng shān lì chūn fēng huā cǎo xiāng ní róng fēi y�
 let currentIndex = 0;
 let currentPoem = poems[currentIndex];
 let autoPlay = true;
+let highlightTimer = null;
+let charList = [];
 const audioPlayer = document.getElementById("audioPlayer");
 const volumeInput = document.getElementById("volume");
 const playBtn = document.getElementById("playBtn");
 const totalNum = poems.length;
+const progressInner = document.getElementById("audioProgress");
 
+// 初始化音量
 audioPlayer.volume = 0.8;
+
+// 音量控制
 volumeInput.addEventListener("input",()=>{
     audioPlayer.volume = volumeInput.value;
 })
 
-audioPlayer.addEventListener("ended",()=>{
-    if(autoPlay) audioPlayer.play();
+// 音频进度
+audioPlayer.addEventListener("timeupdate",()=>{
+    let p = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+    progressInner.style.width = p+"%";
 })
+
+// 播放结束逻辑
+audioPlayer.addEventListener("ended",()=>{
+    clearHighlight();
+    progressInner.style.width = "0%";
+    if(autoPlay) {
+        setTimeout(()=>{
+            nextPoem();
+        }, 1200);
+    }
+})
+
+// 切换主题
+function setTheme(num){
+    let root = document.documentElement;
+    if(num===1){
+        root.style.setProperty("--main-bg","linear-gradient(160deg, #FFF5F8 0%, #FFE6EF 100%)");
+        root.style.setProperty("--title-color","#FF4E75");
+    }else if(num===2){
+        root.style.setProperty("--main-bg","linear-gradient(160deg,#f0fff8,#dff8ee)");
+        root.style.setProperty("--title-color","#27ae60");
+    }else{
+        root.style.setProperty("--main-bg","linear-gradient(160deg,#f5f8ff,#e8f0ff)");
+        root.style.setProperty("--title-color","#346ed9");
+    }
+}
+
+// 清除高亮
+function clearHighlight(){
+    clearInterval(highlightTimer);
+    document.querySelectorAll(".char-box").forEach(el=>el.classList.remove("active"));
+}
+
+// 逐字高亮
+function startHighlight(){
+    clearHighlight();
+    let idx = 0;
+    highlightTimer = setInterval(()=>{
+        if(idx>0) charList[idx-1].classList.remove("active");
+        if(idx < charList.length){
+            charList[idx].classList.add("active");
+            idx++;
+        }else{
+            clearInterval(highlightTimer);
+        }
+    },350)
+}
 
 function toggleAutoPlay(){
     autoPlay = !autoPlay;
@@ -220,19 +430,44 @@ function switchAudio(){
         audioPlayer.src = AUDIO_PATH + currentPoem.audio;
         audioPlayer.play();
         playBtn.innerText = "暂停";
+        startHighlight();
     }else{
         audioPlayer.pause();
         playBtn.innerText = "播放";
+        clearHighlight();
+    }
+}
+
+function prevPoem(){
+    audioPlayer.pause();
+    playBtn.innerText = "播放";
+    clearHighlight();
+    progressInner.style.width="0%";
+    currentIndex--;
+    if(currentIndex < 0){
+        alert("已经是第一首啦！");
+        currentIndex = totalNum - 1;
+    }
+    currentPoem = poems[currentIndex];
+    renderPoem();
+    if(autoPlay){
+        setTimeout(()=>{
+            audioPlayer.src = AUDIO_PATH + currentPoem.audio;
+            audioPlayer.play();
+            playBtn.innerText = "暂停";
+            startHighlight();
+        },300)
     }
 }
 
 function nextPoem(){
     audioPlayer.pause();
     playBtn.innerText = "播放";
+    clearHighlight();
+    progressInner.style.width="0%";
     currentIndex++;
-    // 判断是否到最后一首
     if(currentIndex >= totalNum){
-        alert("已经是最后一首古诗啦，即将回到第一首！");
+        alert("已经是最后一首啦！即将回到第一首😊");
         currentIndex = 0;
     }
     currentPoem = poems[currentIndex];
@@ -242,6 +477,7 @@ function nextPoem(){
             audioPlayer.src = AUDIO_PATH + currentPoem.audio;
             audioPlayer.play();
             playBtn.innerText = "暂停";
+            startHighlight();
         },300)
     }
 }
@@ -251,6 +487,7 @@ function renderPoem(){
     document.getElementById("author").innerText = currentPoem.author;
     const container = document.getElementById("poemContainer");
     container.innerHTML = "";
+    charList = [];
 
     const hanziAll = currentPoem.content.split("|");
     const pinyinAll = currentPoem.pinyin.split(/\s+/);
@@ -264,6 +501,7 @@ function renderPoem(){
             let box = document.createElement("div");
             box.className = "char-box";
             box.innerHTML = `<div class="pinyin">${py}</div><div class="hanzi">${h}</div>`;
+            charList.push(box);
             lineDom.appendChild(box);
         })
         container.appendChild(lineDom);
